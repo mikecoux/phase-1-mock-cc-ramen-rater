@@ -1,4 +1,7 @@
 // write your code here
+let currentRamen;
+const displayComment = document.querySelector('#comment-display');
+
 document.addEventListener('DOMContentLoaded', init())
 
 function init () {
@@ -12,6 +15,9 @@ function init () {
             loadRamen(data[0])
             //create new ramen elements on form submit
             newRamen()
+            //advanced deliverable
+            //delete ramen elements
+            deleteRamen()
         })
 }
 
@@ -30,12 +36,11 @@ function ramenMenu (ramensObj) {
 }
 
 function loadRamen (ramenObj) {
+    currentRamen = ramenObj
     const displayImg = document.querySelector('#ramen-detail .detail-image')
     const displayName = document.querySelector('#ramen-detail .name')
     const displayRestaurant = document.querySelector('#ramen-detail .restaurant')
     const displayRating = document.querySelector('#rating-display')
-    const displayComment = document.querySelector('#comment-display')
-
 
     const {id, name, restaurant, image, rating, comment} = ramenObj
     displayImg.src = image
@@ -53,23 +58,44 @@ function newRamen () {
     const newImage = ramenForm.querySelector('#new-image')
     const newRating = ramenForm.querySelector('#new-rating')
     const newComment = ramenForm.querySelector('#new-comment')
+    let submission = {}
     //add event listener for form submit
     ramenForm.addEventListener('submit', (e) => {
-        //create a new object with data from the form
-        const submission = {
-            name: newName.value,
-            restaurant: newRestaurant.value,
-            image: newImage.value,
-            rating: newRating.value,
-            comment: newComment.value
-        }
-        //post request
+        //add data to the submission object
+        submission.name = newName.value
+        submission.restaurant = newRestaurant.value
+        submission.image = newImage.value
+        submission.rating = newRating.value
+        submission.comment = newComment.value
+        //check to see that form is filled out
+        submission.name.length == 0 ? alert('Please fill out all form fields.') : newRamenSubmit(submission)
+    })
+
+    function newRamenSubmit(submitObj) {
         fetch ('http://localhost:3000/ramens', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(submission)
+            body: JSON.stringify(submitObj)
         })
+    }
+}
+
+function deleteRamen () {
+    const deleteButton = document.createElement('button');
+    deleteButton.innerText = 'DELETE'
+    deleteButton.id = 'delete-button'
+    deleteButton.className = 'button'
+    displayComment.after(deleteButton)
+
+    deleteButton.addEventListener('click', () => {
+        fetch (`http://localhost:3000/ramens/${currentRamen.id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+            .then (location.reload())
     })
 }

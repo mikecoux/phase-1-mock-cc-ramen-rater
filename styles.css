@@ -100,3 +100,8 @@ form h4 {
   color: white;
   background-color: black;
 }
+
+.button {
+  margin: 0.5rem 0;
+  color: red;
+}
